@@ -1,0 +1,611 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;
+  --border:#30363d;--border2:#484f58;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --blue:#58a6ff;--blue-dim:#1f6feb;
+  --green:#3fb950;--green-dim:#238636;
+  --amber:#e3b341;--amber-dim:#9e6a03;
+  --red:#f85149;--red-dim:#8b1a1a;
+  --purple:#bc8cff;
+  --font:'IBM Plex Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;min-height:100vh}
+h1{font-size:18px;font-weight:500}
+h2{font-size:14px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
+h3{font-size:13px;font-weight:500}
+.shell{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.nav{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0;display:flex;flex-direction:column;gap:2px}
+.nav-logo{padding:0 16px 16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.nav-logo span{font-family:var(--font);font-size:11px;color:var(--text3);display:block;margin-top:2px}
+.nav-item{padding:8px 16px;cursor:pointer;border-radius:0;transition:background .15s;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg3);color:var(--blue);border-left-color:var(--blue)}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.g{background:var(--green)}
+.dot.a{background:var(--amber)}
+.dot.r{background:var(--red)}
+.main{padding:20px;overflow:auto;background:var(--bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-family:var(--font);font-size:11px;color:var(--text2)}
+.chip span{color:var(--green)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px}
+.kpi-label{font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--font);letter-spacing:.06em}
+.kpi-val{font-size:22px;font-weight:500;font-family:var(--font);line-height:1}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:4px}
+.kpi-val.g{color:var(--green)}
+.kpi-val.a{color:var(--amber)}
+.kpi-val.r{color:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.badge{font-family:var(--font);font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500}
+.badge.g{background:#238636;color:#3fb950}
+.badge.a{background:#9e6a03;color:#e3b341}
+.badge.r{background:#8b1a1a;color:#f85149}
+.badge.b{background:#1f6feb;color:#58a6ff}
+.badge.p{background:#4a3060;color:#bc8cff}
+.vehicle-list{display:flex;flex-direction:column;gap:8px}
+.vehicle-row{display:grid;grid-template-columns:30px 1fr 60px 70px 80px 70px;align-items:center;gap:10px;padding:8px 10px;border-radius:4px;cursor:pointer;transition:background .15s}
+.vehicle-row:hover{background:var(--bg3)}
+.vehicle-row.selected{background:var(--bg3);border-left:2px solid var(--blue);margin-left:-2px}
+.v-id{font-family:var(--font);font-size:11px;color:var(--text3)}
+.v-name{font-size:12px;font-weight:500}
+.v-score{font-family:var(--font);font-size:13px;font-weight:500;text-align:right}
+.v-score.g{color:var(--green)}
+.v-score.a{color:var(--amber)}
+.v-score.r{color:var(--red)}
+.bar-wrap{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .6s}
+.bar-fill.g{background:var(--green)}
+.bar-fill.a{background:var(--amber)}
+.bar-fill.r{background:var(--red)}
+.gauge-wrap{position:relative;width:140px;height:80px;margin:0 auto}
+.gauge-label{text-align:center;font-family:var(--font);font-size:20px;font-weight:500;margin-top:6px}
+.param-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.param-row:last-child{border-bottom:none}
+.param-key{color:var(--text2)}
+.param-val{font-family:var(--font);font-weight:500}
+.event-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.event-row:last-child{border-bottom:none}
+.event-icon{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.event-icon.ha{background:#3a1f1a;color:var(--red)}
+.event-icon.hb{background:#1a2a3a;color:var(--blue)}
+.event-icon.sc{background:#2a2a1a;color:var(--amber)}
+.event-icon.id{background:#1a3a2a;color:var(--green)}
+.sparkline-row{display:flex;align-items:flex-end;gap:2px;height:40px}
+.spark-bar{width:100%;background:var(--bg3);border-radius:2px 2px 0 0;position:relative;transition:background .2s;cursor:pointer}
+.spark-bar:hover{background:var(--blue-dim)}
+.stress-band{height:8px;border-radius:2px;margin-bottom:4px}
+.tip{font-size:11px;color:var(--text2);padding:4px 0;border-left:2px solid var(--blue-dim);padding-left:8px;margin-bottom:6px;line-height:1.5}
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:7px 14px;font-size:12px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.chart-area{height:130px;position:relative;overflow:hidden}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-logo">
+    <h3 style="font-family:'IBM Plex Mono',monospace;font-size:14px">VAS</h3>
+    <span>Fleet Analytics v1.0</span>
+  </div>
+  <div class="nav-item active" onclick="setPage('fleet')"><div class="dot g"></div>Fleet Overview</div>
+  <div class="nav-item" onclick="setPage('vehicle')"><div class="dot a"></div>Vehicle Health</div>
+  <div class="nav-item" onclick="setPage('driver')"><div class="dot g"></div>Driver Behavior</div>
+  <div class="nav-item" onclick="setPage('stress')"><div class="dot a"></div>Stress Model</div>
+  <div class="nav-item" onclick="setPage('ml')"><div class="dot g"></div>ML Predictions</div>
+  <div style="flex:1"></div>
+  <div style="padding:12px 16px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace">
+    <div>6 vehicles online</div>
+    <div style="margin-top:2px">MQTT ● live</div>
+  </div>
+</nav>
+
+<main class="main" id="main-content">
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const VEHICLES=[
+  {id:"MH01AB1234",name:"Innova Crysta",driver:"Aditya K.",health:87,score:82,km:24182,dtc:0,status:"g",fault:"Normal",stress:0.31,days:62,events:{ha:2,hb:3,sc:1,sp:0},idle:0.06,rpm:2350,speed:61,throttle:33,coolant:91,load:47,maf:14.3},
+  {id:"KA05CD5678",name:"Swift Dzire",driver:"Darin J.",health:72,score:68,km:41250,dtc:1,status:"a",fault:"Fuel_System_Anomaly",stress:0.54,days:18,events:{ha:6,hb:8,sc:3,sp:2},idle:0.14,rpm:2800,speed:54,throttle:45,coolant:89,load:62,maf:18.1},
+  {id:"MH02EF9012",name:"Fortuner",driver:"Chetan M.",health:91,score:88,km:18400,dtc:0,status:"g",fault:"Normal",stress:0.28,days:88,events:{ha:1,hb:2,sc:0,sp:1},idle:0.04,rpm:2100,speed:72,throttle:28,coolant:93,load:38,maf:11.8},
+  {id:"TN09GH3456",name:"Tata Nexon",driver:"Rama N.",health:58,score:51,km:67900,dtc:3,status:"r",fault:"Coolant_System_Warning",stress:0.79,days:6,events:{ha:9,hb:12,sc:5,sp:4},idle:0.22,rpm:3200,speed:38,throttle:58,coolant:103,load:74,maf:22.7},
+  {id:"DL03IJ7890",name:"Ertiga",driver:"Dikshita D.",health:80,score:76,km:29600,dtc:0,status:"g",fault:"Normal",stress:0.38,days:44,events:{ha:3,hb:4,sc:2,sp:1},idle:0.09,rpm:2450,speed:58,throttle:37,coolant:90,load:51,maf:15.9},
+  {id:"MH04KL2345",name:"Bolero",driver:"Aditi D.",health:65,score:62,km:52100,dtc:2,status:"a",fault:"Ignition_Degradation",stress:0.61,days:22,events:{ha:5,hb:6,sc:3,sp:2},idle:0.17,rpm:2650,speed:45,throttle:52,coolant:96,load:66,maf:19.4},
+];
+let selected=0;
+let charts={};
+let currentPage='fleet';
+
+function setPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-item').forEach((el,i)=>{
+    el.classList.toggle('active',['fleet','vehicle','driver','stress','ml'][i]===page);
+  });
+  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});
+  charts={};
+  renderPage();
+}
+
+function renderPage(){
+  const el=document.getElementById('main-content');
+  if(currentPage==='fleet') el.innerHTML=renderFleet();
+  else if(currentPage==='vehicle') el.innerHTML=renderVehicle();
+  else if(currentPage==='driver') el.innerHTML=renderDriver();
+  else if(currentPage==='stress') el.innerHTML=renderStress();
+  else el.innerHTML=renderML();
+
+  if(currentPage==='fleet') bindFleet();
+  else if(currentPage==='vehicle') renderVehicleCharts();
+  else if(currentPage==='driver') renderDriverCharts();
+  else if(currentPage==='stress') renderStressCharts();
+  else renderMLCharts();
+}
+
+function healthColor(h){return h>=80?'g':h>=60?'a':'r'}
+function scoreColor(s){return s>=70?'g':s>=50?'a':'r'}
+function sc(h){return h>=80?'var(--green)':h>=60?'var(--amber)':'var(--red)'}
+
+function renderFleet(){
+  const v=VEHICLES;
+  const avgHealth=(v.reduce((a,x)=>a+x.health,0)/v.length).toFixed(0);
+  const totalDTC=v.reduce((a,x)=>a+x.dtc,0);
+  const alerts=v.filter(x=>x.status==='r').length;
+  const avgScore=(v.reduce((a,x)=>a+x.score,0)/v.length).toFixed(0);
+
+  return `
+  <div class="topbar">
+    <h1>Fleet Overview</h1>
+    <div style="display:flex;gap:8px">
+      <div class="chip">MQTT <span>● live</span></div>
+      <div class="chip">6 vehicles</div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">FLEET HEALTH</div><div class="kpi-val ${healthColor(avgHealth)}">${avgHealth}</div><div class="kpi-sub">avg score /100</div></div>
+    <div class="kpi"><div class="kpi-label">DRIVER SCORE</div><div class="kpi-val g">${avgScore}</div><div class="kpi-sub">fleet avg /100</div></div>
+    <div class="kpi"><div class="kpi-label">ACTIVE DTCs</div><div class="kpi-val r">${totalDTC}</div><div class="kpi-sub">${alerts} critical alerts</div></div>
+    <div class="kpi"><div class="kpi-label">DATA TX</div><div class="kpi-val b" style="color:var(--blue)">6.1 MB</div><div class="kpi-sub">today · 6 vehicles</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Vehicle roster</h2><span class="badge b">live</span></div>
+      <div style="display:grid;grid-template-columns:30px 1fr 60px 70px 80px 70px;gap:10px;padding:0 10px 6px;font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace">
+        <span></span><span>VEHICLE</span><span style="text-align:right">HEALTH</span><span style="text-align:right">SCORE</span><span>STATUS</span><span>DTC</span>
+      </div>
+      <div class="vehicle-list">
+        ${v.map((x,i)=>`
+        <div class="vehicle-row ${selected===i?'selected':''}" onclick="selectV(${i})">
+          <div class="dot ${x.status}"></div>
+          <div><div class="v-name">${x.name}</div><div class="v-id">${x.id}</div></div>
+          <div class="v-score ${healthColor(x.health)}">${x.health}</div>
+          <div class="v-score ${scoreColor(x.score)}">${x.score}</div>
+          <div><div class="bar-wrap" style="width:70px"><div class="bar-fill ${x.status}" style="width:${x.health}%"></div></div></div>
+          <div><span class="badge ${x.dtc>0?(x.dtc>2?'r':'a'):'g'}">${x.dtc} DTC${x.dtc!==1?'s':''}</span></div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Fleet health distribution</h2></div>
+      <div style="height:160px;position:relative"><canvas id="fleetChart" role="img" aria-label="Fleet health distribution chart">Fleet health distribution across 6 vehicles.</canvas></div>
+      <div style="margin-top:12px">
+        ${v.map(x=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:12px">
+          <span style="color:var(--text2)">${x.name}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="bar-wrap" style="width:80px"><div class="bar-fill ${healthColor(x.health)}" style="width:${x.health}%"></div></div>
+            <span style="font-family:'IBM Plex Mono';width:24px;text-align:right;color:${sc(x.health)}">${x.health}</span>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>Predictive alerts</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      ${v.filter(x=>x.days<30).map(x=>`
+      <div style="background:var(--bg3);border-radius:4px;padding:10px;border-left:3px solid ${x.days<10?'var(--red)':'var(--amber)'}">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${x.id}</div>
+        <div style="font-size:13px;font-weight:500">${x.name}</div>
+        <div style="font-size:12px;color:${x.days<10?'var(--red)':'var(--amber)'};margin-top:4px;font-family:'IBM Plex Mono'">${x.days}d to service</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${x.fault.replace(/_/g,' ')}</div>
+      </div>`).join('')}
+      <div style="background:var(--bg3);border-radius:4px;padding:10px;border-left:3px solid var(--blue)">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">ALL VEHICLES</div>
+        <div style="font-size:13px;font-weight:500">Edge models synced</div>
+        <div style="font-size:12px;color:var(--blue);margin-top:4px;font-family:'IBM Plex Mono'">TFLite v1.2</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Int8 quantized · 13 KB</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindFleet(){
+  const data=VEHICLES.map(v=>v.health);
+  const colors=VEHICLES.map(v=>v.status==='g'?'#3fb950':v.status==='a'?'#e3b341':'#f85149');
+  const ctx=document.getElementById('fleetChart');
+  if(!ctx)return;
+  charts.fleet=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:VEHICLES.map(v=>v.id.slice(-4)),
+      datasets:[{data,backgroundColor:colors,borderWidth:0,borderRadius:3}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{min:0,max:100,ticks:{color:'#6e7681',font:{family:'IBM Plex Mono',size:10}},grid:{color:'#21262d'}},
+        x:{ticks:{color:'#6e7681',font:{family:'IBM Plex Mono',size:10}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function selectV(i){selected=i;renderPage();}
+
+function renderVehicle(){
+  const v=VEHICLES[selected];
+  const hc=healthColor(v.health);
+  return `
+  <div class="topbar">
+    <div>
+      <h1>${v.name} <span style="font-size:13px;color:var(--text2);font-family:'IBM Plex Mono'">${v.id}</span></h1>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px">Driver: ${v.driver} · ${v.km.toLocaleString()} km</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge ${v.status}">${v.status==='g'?'Healthy':v.status==='a'?'Warning':'Critical'}</span>
+      ${v.dtc>0?`<span class="badge r">${v.dtc} DTC${v.dtc>1?'s':''}</span>`:''}
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">HEALTH SCORE</div><div class="kpi-val ${hc}">${v.health}</div><div class="kpi-sub">/100 composite</div></div>
+    <div class="kpi"><div class="kpi-label">FAULT CLASS</div><div class="kpi-val" style="font-size:14px;color:${v.fault==='Normal'?'var(--green)':'var(--amber)'}">${v.fault.replace(/_/g,' ')}</div><div class="kpi-sub">ML prediction</div></div>
+    <div class="kpi"><div class="kpi-label">SERVICE IN</div><div class="kpi-val ${v.days<15?'r':v.days<40?'a':'g'}">${v.days}d</div><div class="kpi-sub">predicted</div></div>
+    <div class="kpi"><div class="kpi-label">STRESS SCORE</div><div class="kpi-val ${v.stress>0.7?'r':v.stress>0.4?'a':'g'}">${v.stress.toFixed(2)}</div><div class="kpi-sub">/1.0 current</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Live OBD-II telemetry</h2><span class="badge b">1 Hz</span></div>
+      <div class="param-row"><span class="param-key">Engine RPM</span><span class="param-val" style="color:var(--blue)">${v.rpm} <span style="font-size:10px;color:var(--text3)">RPM</span></span></div>
+      <div class="param-row"><span class="param-key">Vehicle speed</span><span class="param-val">${v.speed} <span style="font-size:10px;color:var(--text3)">km/h</span></span></div>
+      <div class="param-row"><span class="param-key">Throttle position</span><span class="param-val">${v.throttle}<span style="font-size:10px;color:var(--text3)">%</span></span></div>
+      <div class="param-row"><span class="param-key">Coolant temp</span><span class="param-val" style="color:${v.coolant>98?'var(--red)':v.coolant>93?'var(--amber)':'var(--green)'}">${v.coolant}°<span style="font-size:10px;color:var(--text3)">C</span></span></div>
+      <div class="param-row"><span class="param-key">Engine load</span><span class="param-val">${v.load}<span style="font-size:10px;color:var(--text3)">%</span></span></div>
+      <div class="param-row"><span class="param-key">Mass airflow</span><span class="param-val">${v.maf} <span style="font-size:10px;color:var(--text3)">g/s</span></span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>RPM trend (30 min)</h2></div>
+      <div style="height:150px;position:relative"><canvas id="rpmChart" role="img" aria-label="RPM trend over 30 minutes">RPM over time for ${v.name}.</canvas></div>
+    </div>
+  </div>
+  <div class="grid3" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="card">
+      <div class="card-header"><h2>Anomaly score</h2></div>
+      <div style="height:110px;position:relative"><canvas id="anomChart" role="img" aria-label="Anomaly score trend">Isolation Forest anomaly score trend.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Engine load dist.</h2></div>
+      <div style="height:110px;position:relative"><canvas id="loadChart" role="img" aria-label="Engine load distribution">Engine load distribution chart.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Fault confidence</h2></div>
+      <div style="height:110px;position:relative"><canvas id="faultChart" role="img" aria-label="Fault class confidence">Random Forest fault class probabilities.</canvas></div>
+    </div>
+  </div>`;
+}
+
+function renderVehicleCharts(){
+  const v=VEHICLES[selected];
+  const n=30;
+  const labels=Array.from({length:n},(_,i)=>i%5===0?`${30-i}m`:'');
+  const base=v.rpm;
+  const rpmData=Array.from({length:n},(_,i)=>Math.round(base+200*Math.sin(i*0.4)+100*(Math.random()-.5)));
+
+  const rpmCtx=document.getElementById('rpmChart');
+  if(rpmCtx) charts.rpm=new Chart(rpmCtx,{
+    type:'line',
+    data:{labels,datasets:[{data:rpmData,borderColor:'#58a6ff',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(88,166,255,0.06)'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:600,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10}},grid:{display:false}}}}
+  });
+
+  const anomScore=v.stress*0.6+0.15;
+  const anomData=Array.from({length:20},(_,i)=>+(anomScore+0.05*Math.sin(i*0.7)+0.03*(Math.random()-.5)).toFixed(3));
+  const anomCtx=document.getElementById('anomChart');
+  if(anomCtx) charts.anom=new Chart(anomCtx,{
+    type:'line',
+    data:{labels:Array.from({length:20},(_,i)=>''),
+      datasets:[{data:anomData,borderColor:'#e3b341',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(227,179,65,0.08)'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:1,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{display:false}}}
+  });
+
+  const loadCtx=document.getElementById('loadChart');
+  if(loadCtx) charts.load=new Chart(loadCtx,{
+    type:'doughnut',
+    data:{labels:['Low (0-30%)','Med (30-70%)','High (>70%)'],
+      datasets:[{data:[100-v.load,Math.min(v.load,70),Math.max(0,v.load-70)],
+        backgroundColor:['#238636','#9e6a03','#8b1a1a'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'60%'}
+  });
+
+  const faultCtx=document.getElementById('faultChart');
+  const isNormal=v.fault==='Normal';
+  if(faultCtx) charts.fault=new Chart(faultCtx,{
+    type:'bar',
+    data:{
+      labels:['Normal','Fuel','Coolant','Ignition','Sensor'],
+      datasets:[{
+        data:isNormal?[0.89,0.04,0.03,0.02,0.02]:[0.12,0.68,0.1,0.06,0.04],
+        backgroundColor:['#238636','#1f6feb','#9e6a03','#8b1a1a','#4a3060'],
+        borderWidth:0,borderRadius:2
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:1,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function renderDriver(){
+  const v=VEHICLES[selected];
+  const sc_=scoreColor(v.score);
+  const tips={
+    g:["Excellent trip. Keep anticipating stops and accelerating gradually.","Low idle time — great fuel efficiency."],
+    a:["Reduce hard braking by increasing following distance.","Engine idled for "+Math.round(v.idle*100)+"% of the trip — turn off engine at stops > 60s.","Slight improvement in cornering speed will boost your score."],
+    r:["Harsh acceleration detected "+v.events.ha+" times. Accelerate gradually — saves 10-15% fuel.","Hard braking events: "+v.events.hb+". Maintain safe following distance.","Speeding events: "+v.events.sp+". Keep within posted speed limits.","Excessive idling ("+Math.round(v.idle*100)+"%). Consider turning engine off when stationary > 60s."]
+  }[scoreColor(v.score)];
+
+  return `
+  <div class="topbar">
+    <h1>Driver Behavior — ${v.driver}</h1>
+    <div style="display:flex;gap:8px">
+      <span class="badge ${sc_}">${v.score>=85?'Excellent':v.score>=70?'Good':v.score>=50?'Needs Improvement':'Risky'}</span>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">COMPOSITE SCORE</div><div class="kpi-val ${sc_}">${v.score}</div><div class="kpi-sub">7-trip rolling avg</div></div>
+    <div class="kpi"><div class="kpi-label">HARSH ACCEL</div><div class="kpi-val ${v.events.ha>4?'r':v.events.ha>2?'a':'g'}">${v.events.ha}</div><div class="kpi-sub">events per 100 km</div></div>
+    <div class="kpi"><div class="kpi-label">HARD BRAKE</div><div class="kpi-val ${v.events.hb>5?'r':v.events.hb>3?'a':'g'}">${v.events.hb}</div><div class="kpi-sub">events per 100 km</div></div>
+    <div class="kpi"><div class="kpi-label">IDLE FRACTION</div><div class="kpi-val ${v.idle>0.15?'r':v.idle>0.08?'a':'g'}">${(v.idle*100).toFixed(0)}%</div><div class="kpi-sub">of engine-on time</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Score breakdown</h2></div>
+      <div style="height:160px;position:relative"><canvas id="radarChart" role="img" aria-label="Driver behavior radar chart">Radar chart showing driver behavior across 5 dimensions.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>7-trip trend</h2></div>
+      <div style="height:160px;position:relative"><canvas id="trendChart" role="img" aria-label="Driver score trend over 7 trips">Driver composite score over last 7 trips.</canvas></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Driving events timeline</h2></div>
+      ${[
+        {type:'ha',icon:'!',label:'Harsh acceleration',count:v.events.ha,sev:'0.48g'},
+        {type:'hb',icon:'↓',label:'Hard braking',count:v.events.hb,sev:'0.55g'},
+        {type:'sc',icon:'↺',label:'Sharp cornering',count:v.events.sc,sev:'0.52g'},
+        {type:'id',icon:'◎',label:'Extended idle',count:Math.round(v.idle*100/4),sev:Math.round(v.idle*100)+'%'},
+      ].map(e=>`
+      <div class="event-row">
+        <div class="event-icon ${e.type}">${e.icon}</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:500">${e.label}</div></div>
+        <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--text2)">×${e.count}</div>
+        <div style="font-family:'IBM Plex Mono';font-size:11px;color:var(--text3);margin-left:8px">${e.sev}</div>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>AI coaching tips</h2></div>
+      ${tips.map(t=>`<div class="tip">${t}</div>`).join('')}
+      <div style="margin-top:10px;font-size:11px;color:var(--text3)">Generated by SVM driving style classifier + DriverScoreCalculator</div>
+    </div>
+  </div>`;
+}
+
+function renderDriverCharts(){
+  const v=VEHICLES[selected];
+  const dimScores=[
+    Math.max(0,100-v.events.ha*2),
+    Math.max(0,100-v.events.hb*2.5),
+    Math.max(0,100-v.events.sc*1.5),
+    Math.max(0,100-v.events.sp*3),
+    Math.max(0,100-v.idle*1000),
+  ];
+  const rCtx=document.getElementById('radarChart');
+  if(rCtx) charts.radar=new Chart(rCtx,{
+    type:'radar',
+    data:{
+      labels:['Acceleration','Braking','Cornering','Speed','Fuel/Idle'],
+      datasets:[{data:dimScores,backgroundColor:'rgba(88,166,255,0.12)',borderColor:'#58a6ff',borderWidth:1.5,pointBackgroundColor:'#58a6ff',pointRadius:3}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'#21262d'},
+        pointLabels:{color:'#8b949e',font:{size:10}},angleLines:{color:'#21262d'}}}}
+  });
+
+  const base=v.score;
+  const tripScores=[base-8,base-5,base-9,base-2,base+3,base+1,base].map(x=>Math.min(100,Math.max(0,x)));
+  const tCtx=document.getElementById('trendChart');
+  if(tCtx) charts.trend=new Chart(tCtx,{
+    type:'line',
+    data:{
+      labels:['T-6','T-5','T-4','T-3','T-2','T-1','Current'],
+      datasets:[{data:tripScores,borderColor:'#3fb950',borderWidth:2,pointBackgroundColor:'#3fb950',pointRadius:4,fill:true,backgroundColor:'rgba(63,185,80,0.08)'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:100,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function renderStress(){
+  const v=VEHICLES[selected];
+  return `
+  <div class="topbar">
+    <h1>Physics-Informed Stress Model</h1>
+    <div style="font-size:11px;color:var(--text3)">ICEQCIIS 2026 · Paper ID 23</div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">CURRENT STRESS</div><div class="kpi-val ${v.stress>0.7?'r':v.stress>0.4?'a':'g'}">${v.stress.toFixed(2)}</div><div class="kpi-sub">S_vehicle /1.0</div></div>
+    <div class="kpi"><div class="kpi-label">POWER RATIO α</div><div class="kpi-val" style="color:var(--blue)">${(v.stress*0.45/0.45).toFixed(2)}</div><div class="kpi-sub">P_engine/P_rated · 0.45</div></div>
+    <div class="kpi"><div class="kpi-label">ACCEL RATIO β</div><div class="kpi-val" style="color:var(--purple)">${(v.stress*0.35/0.35).toFixed(2)}</div><div class="kpi-sub">|ā|/a_max · 0.35</div></div>
+    <div class="kpi"><div class="kpi-label">THERMAL RATIO γ</div><div class="kpi-val" style="color:var(--amber)">${(Math.max(0,v.coolant-95)/25).toFixed(2)}</div><div class="kpi-sub">ΔT/25°C · 0.20</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Stress score over trip (30-s windows)</h2><span class="badge ${v.stress>0.75?'r':v.stress>0.4?'a':'g'}">${v.stress>0.75?'High stress':v.stress>0.4?'Moderate':'Normal'}</span></div>
+      <div style="height:160px;position:relative"><canvas id="stressChart" role="img" aria-label="Vehicle stress score over time">Stress score across 30-second windows.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Component contributions</h2></div>
+      <div style="height:160px;position:relative"><canvas id="contribChart" role="img" aria-label="Stress component contributions">Stacked area chart of stress model components.</canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>Virtual dynamometer output</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      ${[
+        {l:'Est. Engine Power',v:'${(v.rpm*0.6/100).toFixed(1)} kW',c:'var(--blue)'},
+        {l:'Rolling resistance',v:'270 N',c:'var(--text)'},
+        {l:'Aerodynamic drag',v:'${Math.round(0.5*0.35*1.225*2.5*(v.speed/3.6)**2)} N',c:'var(--text)'},
+        {l:'Torque estimate',v:'${Math.round(v.load*3)} Nm',c:'var(--amber)'},
+      ].map(x=>`<div style="background:var(--bg3);border-radius:4px;padding:10px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-family:'IBM Plex Mono'">${x.l.toUpperCase()}</div>
+        <div style="font-size:16px;font-weight:500;color:${x.c};font-family:'IBM Plex Mono'">${eval('`'+x.v+'`')}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:4px;font-size:11px;color:var(--text2);font-family:'IBM Plex Mono'">
+      S = 0.45 × P_ratio + 0.35 × |ā|/a_max + 0.20 × ΔT/25 = <span style="color:${v.stress>0.7?'var(--red)':v.stress>0.4?'var(--amber)':'var(--green)'}">
+      ${v.stress.toFixed(4)}</span>  ${v.stress>0.75?'⚠ HIGH — accelerated maintenance recommended':''}
+    </div>
+  </div>`;
+}
+
+function renderStressCharts(){
+  const v=VEHICLES[selected];
+  const n=20;
+  const base=v.stress;
+  const windows=Array.from({length:n},(_,i)=>+Math.max(0,Math.min(1,base+0.1*Math.sin(i*0.5)+0.05*(Math.random()-.5))).toFixed(3));
+  const labels=Array.from({length:n},(_,i)=>(i*0.5).toFixed(1)+'m');
+
+  const stressCtx=document.getElementById('stressChart');
+  if(stressCtx) charts.stress=new Chart(stressCtx,{
+    type:'line',
+    data:{labels,datasets:[{
+      data:windows,
+      borderColor:base>0.7?'#f85149':base>0.4?'#e3b341':'#3fb950',
+      borderWidth:1.5,pointRadius:0,fill:true,
+      backgroundColor:base>0.7?'rgba(248,81,73,0.1)':base>0.4?'rgba(227,179,65,0.1)':'rgba(63,185,80,0.1)'
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      annotation:{annotations:{threshold:{type:'line',yMin:0.75,yMax:0.75,borderColor:'rgba(248,81,73,0.5)',borderWidth:1,borderDash:[4,4]}}}},
+      scales:{y:{min:0,max:1,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10},maxTicksLimit:6},grid:{display:false}}}}
+  });
+
+  const pw=windows.map(x=>+(x*0.45).toFixed(3));
+  const aw=windows.map(x=>+(x*0.35).toFixed(3));
+  const tw=windows.map(x=>+(x*0.20).toFixed(3));
+  const cCtx=document.getElementById('contribChart');
+  if(cCtx) charts.contrib=new Chart(cCtx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'α Power',data:pw,borderColor:'#58a6ff',borderWidth:1,pointRadius:0,fill:true,backgroundColor:'rgba(88,166,255,0.2)'},
+      {label:'β Accel',data:aw,borderColor:'#bc8cff',borderWidth:1,pointRadius:0,fill:true,backgroundColor:'rgba(188,140,255,0.2)'},
+      {label:'γ Thermal',data:tw,borderColor:'#e3b341',borderWidth:1,pointRadius:0,fill:true,backgroundColor:'rgba(227,179,65,0.2)'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:1,stacked:false,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10},maxTicksLimit:6},grid:{display:false}}}}
+  });
+}
+
+function renderML(){
+  return `
+  <div class="topbar"><h1>ML Prediction Pipeline</h1><span class="badge p">scikit-learn + TFLite</span></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2>Model performance (5000-record dataset)</h2></div>
+      <div style="height:180px;position:relative"><canvas id="perfChart" role="img" aria-label="ML model performance metrics">Precision, recall and F1 for each ML model.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Fleet fault distribution</h2></div>
+      <div style="height:180px;position:relative"><canvas id="faultDistChart" role="img" aria-label="Fleet fault distribution">Fault class distribution across fleet.</canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>Pipeline modules</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      ${[
+        {name:'feature_engineering.py',desc:'Rolling windows · RPM · coolant · fuel trim · load hist',color:'var(--blue)'},
+        {name:'predictive_models.py',desc:'Isolation Forest · Random Forest · Maintenance Predictor',color:'var(--purple)'},
+        {name:'driver_scoring.py',desc:'Event detector · Score calc · SVM style classifier',color:'var(--green)'},
+        {name:'stress_model.py',desc:'Virtual dynamometer · Physics stress formula',color:'var(--amber)'},
+        {name:'tflite_edge_model.py',desc:'3-layer net · int8 quant · ESP32 C header export',color:'var(--red)'},
+        {name:'pipeline.py',desc:'End-to-end orchestrator · Train + infer modes',color:'var(--text2)'},
+      ].map(m=>`<div style="background:var(--bg3);border-radius:4px;padding:10px;border-left:2px solid ${m.color}">
+        <div style="font-family:'IBM Plex Mono';font-size:11px;color:${m.color};margin-bottom:4px">${m.name}</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5">${m.desc}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-header"><h2>Inference latency benchmark</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      ${[
+        {l:'Cloud Random Forest',v:'18 ms',c:'var(--blue)'},
+        {l:'Cloud Isolation Forest',v:'12 ms',c:'var(--purple)'},
+        {l:'TFLite float32',v:'2.8 ms',c:'var(--green)'},
+        {l:'TFLite int8 (ESP32)',v:'4.2 ms',c:'var(--amber)'},
+      ].map(x=>`<div style="background:var(--bg3);border-radius:4px;padding:10px">
+        <div style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono';margin-bottom:6px">${x.l.toUpperCase()}</div>
+        <div style="font-size:20px;font-weight:500;color:${x.c};font-family:'IBM Plex Mono'">${x.v}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderMLCharts(){
+  const models=['Fault Classifier (RF)','Anomaly Detector (IF)','Driver SVM','TFLite Edge'];
+  const prec=[0.91,0.87,0.93,0.84];
+  const rec=[0.88,0.92,0.90,0.89];
+  const f1=[0.89,0.89,0.91,0.86];
+
+  const pCtx=document.getElementById('perfChart');
+  if(pCtx) charts.perf=new Chart(pCtx,{
+    type:'bar',
+    data:{labels:models,datasets:[
+      {label:'Precision',data:prec,backgroundColor:'#1f6feb',borderWidth:0,borderRadius:2},
+      {label:'Recall',data:rec,backgroundColor:'#238636',borderWidth:0,borderRadius:2},
+      {label:'F1',data:f1,backgroundColor:'#4a3060',borderWidth:0,borderRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:0.7,max:1,ticks:{color:'#6e7681',font:{size:10}},grid:{color:'#21262d'}},
+              x:{ticks:{color:'#6e7681',font:{size:10},maxRotation:20},grid:{display:false}}}}
+  });
+
+  const faults=VEHICLES.map(v=>v.fault);
+  const counts={};
+  faults.forEach(f=>{counts[f]=(counts[f]||0)+1});
+  const fdCtx=document.getElementById('faultDistChart');
+  if(fdCtx) charts.fd=new Chart(fdCtx,{
+    type:'doughnut',
+    data:{labels:Object.keys(counts).map(k=>k.replace(/_/g,' ')),
+      datasets:[{data:Object.values(counts),backgroundColor:['#238636','#1f6feb','#9e6a03','#8b1a1a','#4a3060'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8b949e',font:{size:10},boxWidth:10}}},cutout:'50%'}
+  });
+}
+
+renderPage();
+</script>
